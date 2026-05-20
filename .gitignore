@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+._*
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local environment / secrets (none expected, but defensive)
+.env
+.env.local
+
+# Logs / temp
+*.log
+.tmp/
