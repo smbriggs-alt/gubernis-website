@@ -47,13 +47,7 @@ deployed to IONOS, waitlist working end-to-end.
    confirm `200 OK` with a valid Let's Encrypt cert. If not, check
    the IONOS SSL panel for the gubernis.com cert status and trigger
    re-issue if needed.
-3. **Sources section refresh.** The "Watching · eleven sources today"
-   caption is right but the source cards in the row still list only
-   6 (FR / OFAC SDN / gov.uk / HMRC Tariff / EU Sanctions / EUR-Lex).
-   Add cards for USTR Section 301, BIS Section 232, Congress.gov,
-   EU Legislative Train, UK Parliament — or split the row into
-   "Published" + "Pipeline" subgroups (V2 of the section).
-4. **"What changed this week" cards.** The current three cards are
+3. **"What changed this week" cards.** The current three cards are
    strong illustrative copy. As real, narrative-strong changes flow
    in, replace with actual ingested items (e.g. real OFAC SDN delta
    entries, real EU CFSP decisions). Refresh maybe weekly.
