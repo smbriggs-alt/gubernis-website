@@ -110,12 +110,14 @@ Multi-page expansion (`/about/`, `/pricing/`, `/how-it-works/`) is deferred. Anc
 - **Hosting:** IONOS web hosting (same vendor as `pragticality.com`).
 - **DNS:** `gubernis.com` is managed in the IONOS control panel.
 - **Auto-deploy:** GitHub Actions workflow at `.github/workflows/deploy.yml`
-  pushes the static files to IONOS over **SFTP (port 22)** on every push to
-  `main`. Convention matches the existing Pragticality sites: one SFTP user
-  per product, scoped to its own directory (`/Pragticality/`, `/Gnomon/`,
-  `/Gubernis/`). The workflow needs four repository secrets:
-  `IONOS_FTP_SERVER`, `IONOS_FTP_USER`, `IONOS_FTP_PASSWORD`,
-  `IONOS_FTP_PATH` — set them in Settings → Secrets and variables → Actions.
+  uses `lftp` to mirror the staged `dist/` directory to IONOS over SFTP
+  (port 22) on every push to `main`. Same pattern as
+  `gnomon-website/.github/workflows/deploy.yml`. The IONOS SFTP user is
+  chrooted to `/Gubernis/`, so lftp uploads to `/` (which from the user's
+  perspective is the webspace's `/Gubernis/`). The workflow needs three
+  repository secrets matching the estate-wide convention:
+  `IONOS_FTP_HOST`, `IONOS_FTP_USER`, `IONOS_FTP_PASS` — set them in
+  Settings → Secrets and variables → Actions.
 - **Form handling:** Formspree free tier (50 submissions/mo). The endpoint
   ID goes into the `<form action>` attribute on `#sign-up`. If Gubernis
   starts pulling enough signups to exceed the free tier, replace the

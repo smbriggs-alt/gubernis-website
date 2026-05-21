@@ -1,49 +1,54 @@
 name: Deploy to IONOS
 
-# Auto-deploy the static site to IONOS web hosting via SFTP on every
-# push to main. Matches the existing IONOS convention used by the
-# other Pragticality Ltd sites (one SFTP user per product, scoped
-# to its own directory: /Pragticality/, /Gnomon/, /Gubernis/).
-#
-# Required GitHub repository secrets
-# (Settings → Secrets and variables → Actions):
-#   IONOS_FTP_SERVER    — IONOS SFTP hostname
-#                         (e.g. access-5018101164.webspace-host.com)
-#   IONOS_FTP_USER      — IONOS SFTP username (a2xxxxxxx)
-#   IONOS_FTP_PASSWORD  — IONOS SFTP password
-#   IONOS_FTP_PATH      — remote directory (e.g. /Gubernis/)
-#
-# Protocol: SFTP over SSH on port 22 (NOT FTPS). The IONOS account
-# is provisioned as SFTP-only.
-
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # allows a manual run from the Actions tab
+  workflow_dispatch:
+
+# Mirror of gnomon-website/.github/workflows/deploy.yml — same pattern, same
+# IONOS account, dedicated SFTP user (Gubernis = a2016447) chrooted to
+# /Gubernis/ on the server. lftp uploads to "/" because the chroot root IS
+# admin-view /Gubernis/.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   IONOS_FTP_HOST  — access-5018101164.webspace-host.com
+#   IONOS_FTP_USER  — a2016447
+#   IONOS_FTP_PASS  — password for that SFTP user
 
 jobs:
-  deploy:
-    name: Sync static files to IONOS via SFTP
+  sftp-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to IONOS via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          server: ${{ secrets.IONOS_FTP_SERVER }}
-          username: ${{ secrets.IONOS_FTP_USER }}
-          password: ${{ secrets.IONOS_FTP_PASSWORD }}
-          port: 22
-          local_path: './*'
-          remote_path: ${{ secrets.IONOS_FTP_PATH }}
-          sftp_only: true
-          # Repo meta + docs are not part of the deployed site.
-          exclude_list: |
-            .git/*
-            .github/*
-            CLAUDE.md
-            SESSION_START.md
-            README.md
-            .gitignore
+      - name: Stage deployable files
+        # Public site files only. Repo-internal files (.git, README,
+        # CLAUDE.md, SESSION_START.md, .github/) are NOT deployed.
+        run: |
+          mkdir -p dist
+          cp index.html styles.css favicon.svg robots.txt sitemap.xml dist/
+          # Search-engine verification files at repo root — match any
+          # present, fail silently if none.
+          cp google*.html dist/ 2>/dev/null || true
+          cp BingSiteAuth.xml dist/ 2>/dev/null || true
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      # No --delete: manually placed files on the server (Google Search
+      # Console verification HTML, Let's Encrypt challenge files, etc.)
+      # are left alone. Password passed via env var so special characters
+      # don't break shell quoting.
+      - name: Deploy via lftp
+        env:
+          SFTP_HOST: ${{ secrets.IONOS_FTP_HOST }}
+          SFTP_USER: ${{ secrets.IONOS_FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.IONOS_FTP_PASS }}
+        run: |
+          lftp -u "$SFTP_USER" --env-password "sftp://$SFTP_HOST:22" <<EOF
+          set sftp:auto-confirm yes
+          pwd
+          mirror -R --verbose --no-perms --no-symlinks ./dist/ /
+          bye
+          EOF
