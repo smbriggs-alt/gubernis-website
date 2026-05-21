@@ -2,44 +2,61 @@
 
 Quick orientation for picking up work on this repo. Read `README.md` and `CLAUDE.md` for the substance; this file is just for the *what now* question.
 
-## ⏸ Where we left off — 2026-05-21
+## ✅ Live — as of 2026-05-21
 
-Mid-deploy. Three commits sit locally on `main` but are **not pushed**, because pushing triggers the auto-deploy and a few prerequisites aren't in place:
+**gubernis.com is live.** Engine running daily on Railway, marketing site
+deployed to IONOS, waitlist working end-to-end.
 
-- `54a34dd` — GitHub Actions workflow + Formspree-backed signup form scaffold
-- `a8297e5` — workflow corrected to SFTP (port 22), matches IONOS account convention
-- `a49c8a3` — real Formspree endpoint wired (`https://formspree.io/f/xwvzopqy`)
+**What's wired up:**
 
-**Decided so far:**
-- Hosting: **IONOS web hosting** (same plan as pragticality.com / gnomon.info)
-- Form handling: **Formspree free tier** (50 submissions/month), form ID `xwvzopqy` already created and linked to Stephen's email
-- Deploy mechanism: **GitHub Actions → IONOS via SFTP**, action `wlixcc/SFTP-Deploy-Action@v1.2.4`
-- Convention: one SFTP user per product, scoped to its own directory. Gubernis lives at `/Gubernis/` on the IONOS web space (mirrors existing `/Pragticality/`, `/Gnomon/`)
-- IONOS web space SFTP host: `access-5018101164.webspace-host.com`
-- IONOS web space IP (for DNS A record): `217.160.199.211`
+- DNS: gubernis.com nameservers at IONOS (`ns1045.ui-dns.*`); A record
+  auto-set to `217.160.0.23` by IONOS once domain was connected to
+  webspace under `/Gubernis/`
+- Hosting: IONOS web space, contract 107127470, host
+  `access-5018101164.webspace-host.com`
+- SFTP user: `a2016447` (chrooted to `/Gubernis/`) — created via the
+  IONOS panel
+- Auto-deploy: GitHub Actions workflow at `.github/workflows/deploy.yml`
+  uses `lftp` over SFTP port 22. Mirror of the gnomon-website pattern.
+  Three secrets in the repo: `IONOS_FTP_HOST`, `IONOS_FTP_USER`,
+  `IONOS_FTP_PASS`. lftp uploads to `/` (chroot root IS `/Gubernis/`).
+  Every push to `main` redeploys.
+- Form: Formspree endpoint `https://formspree.io/f/xwvzopqy` wired into
+  `#sign-up`. Submissions land in the Formspree dashboard and forward
+  to Stephen's email. End-to-end tested 2026-05-21.
+- Watch counter: numbers refreshed from real engine data on
+  2026-05-21 (24 changes today / 31 last 7d / 407 docs tracked / 11
+  sources / § 8 ambiguity flags). Manual refresh for now — see the
+  follow-up below.
+- SSL: Let's Encrypt cert via IONOS — provisioning kicked off when
+  domain was connected. May still be propagating through their edge
+  even after IONOS marks it "issued" (their platform had system
+  issues 2026-05-21). HTTP works regardless.
 
-**What's blocked / still to do:**
+**Follow-ups worth doing when you pick this up:**
 
-1. **gubernis.com DNS pointing.** Domain registered via Fasthosts reseller (whois shows IONOS as upstream registrar but the control panel is Fasthosts — gubernis.com is NOT in the IONOS account's domain list). Current A record: `213.171.195.105` (Fasthosts hosting). Needs to change to `217.160.199.211` (IONOS web space). User was logged into Fasthosts when the session ended; the DNS edit wasn't applied yet. Same change for `www` if there's a separate record. *Path A (switch nameservers to IONOS) doesn't work because gubernis.com isn't in this IONOS account.*
-
-2. **IONOS SFTP user for Gubernis.** Attempted creation failed twice — IONOS panel was throwing system errors ("We're sorry, an error has occurred in our systems"). Plan when IONOS recovers: create new SFTP user with personal note `Gubernis`, directory `/Gubernis/`, SFTP-only (not SFTP+SSH), set a strong password. Workaround if IONOS keeps yipping: use the existing Indulgence account `a2169464` which is scoped to `/` and can write to `/Gubernis/` — less clean but functional.
-
-3. **IONOS — point `gubernis.com` at `/Gubernis/`.** Either set up gubernis.com as an "External domain" in IONOS Domains and map document root to `/Gubernis/`, OR use IONOS's "Connect domain to webspace" flow once the new SFTP user exists. The user previously did this step for some domain but it didn't appear in the IONOS domain list — re-do once IONOS is healthy.
-
-4. **GitHub Secrets for the deploy workflow.** Match the estate-wide naming
-   used by `gnomon-website` (lftp-based, chrooted SFTP user). Add at
-   `github.com/smbriggs-alt/gubernis-website/settings/secrets/actions`:
-   - `IONOS_FTP_HOST` = `access-5018101164.webspace-host.com`
-   - `IONOS_FTP_USER` = `a2016447` (the Gubernis SFTP user, chrooted to `/Gubernis/`)
-   - `IONOS_FTP_PASS` = matching password (set when the SFTP user was created)
-   No path secret needed — the lftp mirror uploads to `/`, which from
-   `a2016447`'s chrooted perspective IS `/Gubernis/`.
-
-5. **Push.** Once 1–4 are in place: `git push origin main` → workflow runs → site goes live.
-
-**Useful pre-push sanity check:** open the local `index.html` in a browser (`file:///…/gubernis-website/index.html`), submit a test through the form. Formspree accepts cross-origin posts, so this proves the form wiring works before the IONOS deploy.
-
-**Engine side (not blocked):** the Gubernis scheduler is live in Railway (commit `fd678e0` on `pragticality/main`). Daily ingest batch runs at 03:30 UTC. Watch counter values on the marketing site can be updated from real engine counts after the next batch fires.
+1. **Watch counter auto-refresh.** Wire a `/gubernis/watch-counter`
+   JSON endpoint on the Railway FastAPI app that returns current
+   counts. Then either (a) have the deploy workflow `curl` that
+   endpoint and `sed`-patch index.html before lftp upload, or (b)
+   add a client-side `fetch()` in index.html that calls the endpoint
+   on page load. (b) is more dynamic but adds CORS surface. (a)
+   freezes the numbers per-deploy but is simpler. ~30 minutes either
+   way.
+2. **HTTPS verification.** Run `curl -I https://gubernis.com` and
+   confirm `200 OK` with a valid Let's Encrypt cert. If not, check
+   the IONOS SSL panel for the gubernis.com cert status and trigger
+   re-issue if needed.
+3. **Sources section refresh.** The "Watching · eleven sources today"
+   caption is right but the source cards in the row still list only
+   6 (FR / OFAC SDN / gov.uk / HMRC Tariff / EU Sanctions / EUR-Lex).
+   Add cards for USTR Section 301, BIS Section 232, Congress.gov,
+   EU Legislative Train, UK Parliament — or split the row into
+   "Published" + "Pipeline" subgroups (V2 of the section).
+4. **"What changed this week" cards.** The current three cards are
+   strong illustrative copy. As real, narrative-strong changes flow
+   in, replace with actual ingested items (e.g. real OFAC SDN delta
+   entries, real EU CFSP decisions). Refresh maybe weekly.
 
 ---
 
