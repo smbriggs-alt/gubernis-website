@@ -26,11 +26,14 @@ Mid-deploy. Three commits sit locally on `main` but are **not pushed**, because 
 
 3. **IONOS — point `gubernis.com` at `/Gubernis/`.** Either set up gubernis.com as an "External domain" in IONOS Domains and map document root to `/Gubernis/`, OR use IONOS's "Connect domain to webspace" flow once the new SFTP user exists. The user previously did this step for some domain but it didn't appear in the IONOS domain list — re-do once IONOS is healthy.
 
-4. **GitHub Secrets for the deploy workflow.** Add at `github.com/smbriggs-alt/gubernis-website/settings/secrets/actions`:
-   - `IONOS_FTP_SERVER` = `access-5018101164.webspace-host.com`
-   - `IONOS_FTP_USER` = the new `a2…` username (or `a2169464` if using Indulgence workaround)
-   - `IONOS_FTP_PASSWORD` = matching password
-   - `IONOS_FTP_PATH` = `/Gubernis/`
+4. **GitHub Secrets for the deploy workflow.** Match the estate-wide naming
+   used by `gnomon-website` (lftp-based, chrooted SFTP user). Add at
+   `github.com/smbriggs-alt/gubernis-website/settings/secrets/actions`:
+   - `IONOS_FTP_HOST` = `access-5018101164.webspace-host.com`
+   - `IONOS_FTP_USER` = `a2016447` (the Gubernis SFTP user, chrooted to `/Gubernis/`)
+   - `IONOS_FTP_PASS` = matching password (set when the SFTP user was created)
+   No path secret needed — the lftp mirror uploads to `/`, which from
+   `a2016447`'s chrooted perspective IS `/Gubernis/`.
 
 5. **Push.** Once 1–4 are in place: `git push origin main` → workflow runs → site goes live.
 
