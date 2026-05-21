@@ -317,11 +317,31 @@
   <div class="container container-narrow">
     <h2>Start watching.</h2>
     <p>Free tier covers your reading week. Upgrade when you need the alerts, the filters, and the Ambiguity Watch.</p>
-    <div class="cta-row">
-      <a href="mailto:hello@gubernis.com?subject=Gubernis early-access list" class="button primary-btn">Join the early-access list &rarr;</a>
-      <a href="#this-week" class="button secondary-btn">See this week&rsquo;s dispatch</a>
-    </div>
-    <p class="cta-note"><em>Gubernis is currently in pre-launch.</em> Join the early-access list and we&rsquo;ll write back when the free tier opens.</p>
+    <form
+      class="signup-form"
+      action="https://formspree.io/f/REPLACE_WITH_FORMSPREE_ID"
+      method="POST"
+    >
+      <label for="signup-email" class="visually-hidden">Email address</label>
+      <input
+        id="signup-email"
+        type="email"
+        name="email"
+        placeholder="you@yourcompany.com"
+        required
+        autocomplete="email"
+      />
+      <input type="hidden" name="_subject" value="Gubernis early-access signup" />
+      <!-- Honeypot field — bots fill this; real users don't see it. -->
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" />
+      <button type="submit" class="button primary-btn">Join the early-access list &rarr;</button>
+    </form>
+    <p class="cta-note"><em>Gubernis is currently in pre-launch.</em> Join the early-access list and we&rsquo;ll write back when the free tier opens. We&rsquo;ll only email you about Gubernis access &mdash; no list-rental, no third-party sharing.</p>
+    <p class="cta-note">
+      <a href="#this-week">See this week&rsquo;s dispatch</a>
+      &nbsp;&middot;&nbsp;
+      Prefer email? <a href="mailto:hello@gubernis.com?subject=Gubernis early-access list">hello@gubernis.com</a>
+    </p>
   </div>
 </section>
 

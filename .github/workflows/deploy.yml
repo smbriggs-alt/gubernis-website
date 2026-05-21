@@ -1,0 +1,47 @@
+name: Deploy to IONOS
+
+# Auto-deploy the static site to IONOS web hosting on every push to main.
+#
+# Required GitHub repository secrets (Settings → Secrets and variables → Actions):
+#   IONOS_FTP_SERVER    — your IONOS SFTP/FTPS hostname (e.g. home123456789.1and1-data.host)
+#   IONOS_FTP_USER      — your IONOS SFTP/FTPS username
+#   IONOS_FTP_PASSWORD  — your IONOS SFTP/FTPS password
+#   IONOS_FTP_PATH      — remote path under the web space root (e.g. /gubernis.com/)
+#                         leading slash, trailing slash. If gubernis.com points at
+#                         the IONOS web space root, set this to '/'.
+#
+# Protocol: IONOS supports FTPS (encrypted FTP over TLS) on port 21 by default.
+# If your IONOS plan is SFTP-only, swap to a different action (e.g.
+# wlixcc/SFTP-Deploy-Action) and update the secrets accordingly.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # allows a manual run from the Actions tab
+
+jobs:
+  deploy:
+    name: Sync static files to IONOS via FTPS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to IONOS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.IONOS_FTP_SERVER }}
+          username: ${{ secrets.IONOS_FTP_USER }}
+          password: ${{ secrets.IONOS_FTP_PASSWORD }}
+          server-dir: ${{ secrets.IONOS_FTP_PATH }}
+          protocol: ftps
+          port: 21
+          # Don't upload the repo's own meta files.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            CLAUDE.md
+            SESSION_START.md
+            README.md
+            .gitignore

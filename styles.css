@@ -695,6 +695,41 @@ a { color: var(--oxblood); text-decoration: none; }
   margin: 0 auto;
 }
 .final-cta .cta-note em { color: var(--oxblood-deep); font-style: italic; font-weight: 500; }
+.final-cta .cta-note + .cta-note { margin-top: 12px; font-size: 13px; }
+.final-cta .cta-note a { color: var(--ink); text-decoration: underline; }
+
+/* Early-access signup form */
+.signup-form {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  max-width: 520px;
+  margin: 0 auto 22px;
+  flex-wrap: wrap;
+}
+.signup-form input[type="email"] {
+  flex: 1 1 280px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: #FFFFFF;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
+.signup-form input[type="email"]:focus {
+  outline: none;
+  border-color: var(--oxblood);
+}
+.signup-form .button { padding: 12px 22px; cursor: pointer; border: 0; font-family: 'Inter', sans-serif; }
+/* Screen-reader-only utility */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 /* ────────────────────────────────────────────
    Footer

@@ -105,11 +105,24 @@ Multi-page expansion (`/about/`, `/pricing/`, `/how-it-works/`) is deferred. Anc
 - **Do not** invent claims, certifications, customer logos, testimonials, or quantitative metrics that aren't backed by real data. The Watch counter is the only metric on the site; it's illustrative until production data is wired.
 - **Do not** describe the engine's mechanism in customer copy. (Repeating because this is the one most likely to be slipped back in.)
 
+## Deploy + form handling
+
+- **Hosting:** IONOS web hosting (same vendor as `pragticality.com`).
+- **DNS:** `gubernis.com` is managed in the IONOS control panel.
+- **Auto-deploy:** GitHub Actions workflow at `.github/workflows/deploy.yml`
+  pushes the static files to IONOS over FTPS on every push to `main`. The
+  workflow needs four repository secrets: `IONOS_FTP_SERVER`,
+  `IONOS_FTP_USER`, `IONOS_FTP_PASSWORD`, `IONOS_FTP_PATH` — set them in
+  Settings → Secrets and variables → Actions.
+- **Form handling:** Formspree free tier (50 submissions/mo). The endpoint
+  ID goes into the `<form action>` attribute on `#sign-up`. If Gubernis
+  starts pulling enough signups to exceed the free tier, replace the
+  Formspree endpoint with either a paid Formspree plan or a tiny PHP
+  mailer hosted alongside the static files on IONOS.
+
 ## Open decisions (carried forward)
 
 - Final tone selection (currently the "Watch House" / Tone C from v1 of the brand direction)
 - Exact oxblood hex (currently `#7A2632`; could shift `±` 10 units after print-style testing)
 - Wordmark spacing (currently `§ Gubernis` with single space)
 - Whether to add a public `/this-week/` weekly-digest page as a lead-gen tool
-- Email collection mechanism (mailto link is V1; serverless form for V2)
-- Hosting / DNS configuration for `gubernis.com`
