@@ -2,6 +2,44 @@
 
 Quick orientation for picking up work on this repo. Read `README.md` and `CLAUDE.md` for the substance; this file is just for the *what now* question.
 
+## ⏸ Where we left off — 2026-05-21
+
+Mid-deploy. Three commits sit locally on `main` but are **not pushed**, because pushing triggers the auto-deploy and a few prerequisites aren't in place:
+
+- `54a34dd` — GitHub Actions workflow + Formspree-backed signup form scaffold
+- `a8297e5` — workflow corrected to SFTP (port 22), matches IONOS account convention
+- `a49c8a3` — real Formspree endpoint wired (`https://formspree.io/f/xwvzopqy`)
+
+**Decided so far:**
+- Hosting: **IONOS web hosting** (same plan as pragticality.com / gnomon.info)
+- Form handling: **Formspree free tier** (50 submissions/month), form ID `xwvzopqy` already created and linked to Stephen's email
+- Deploy mechanism: **GitHub Actions → IONOS via SFTP**, action `wlixcc/SFTP-Deploy-Action@v1.2.4`
+- Convention: one SFTP user per product, scoped to its own directory. Gubernis lives at `/Gubernis/` on the IONOS web space (mirrors existing `/Pragticality/`, `/Gnomon/`)
+- IONOS web space SFTP host: `access-5018101164.webspace-host.com`
+- IONOS web space IP (for DNS A record): `217.160.199.211`
+
+**What's blocked / still to do:**
+
+1. **gubernis.com DNS pointing.** Domain registered via Fasthosts reseller (whois shows IONOS as upstream registrar but the control panel is Fasthosts — gubernis.com is NOT in the IONOS account's domain list). Current A record: `213.171.195.105` (Fasthosts hosting). Needs to change to `217.160.199.211` (IONOS web space). User was logged into Fasthosts when the session ended; the DNS edit wasn't applied yet. Same change for `www` if there's a separate record. *Path A (switch nameservers to IONOS) doesn't work because gubernis.com isn't in this IONOS account.*
+
+2. **IONOS SFTP user for Gubernis.** Attempted creation failed twice — IONOS panel was throwing system errors ("We're sorry, an error has occurred in our systems"). Plan when IONOS recovers: create new SFTP user with personal note `Gubernis`, directory `/Gubernis/`, SFTP-only (not SFTP+SSH), set a strong password. Workaround if IONOS keeps yipping: use the existing Indulgence account `a2169464` which is scoped to `/` and can write to `/Gubernis/` — less clean but functional.
+
+3. **IONOS — point `gubernis.com` at `/Gubernis/`.** Either set up gubernis.com as an "External domain" in IONOS Domains and map document root to `/Gubernis/`, OR use IONOS's "Connect domain to webspace" flow once the new SFTP user exists. The user previously did this step for some domain but it didn't appear in the IONOS domain list — re-do once IONOS is healthy.
+
+4. **GitHub Secrets for the deploy workflow.** Add at `github.com/smbriggs-alt/gubernis-website/settings/secrets/actions`:
+   - `IONOS_FTP_SERVER` = `access-5018101164.webspace-host.com`
+   - `IONOS_FTP_USER` = the new `a2…` username (or `a2169464` if using Indulgence workaround)
+   - `IONOS_FTP_PASSWORD` = matching password
+   - `IONOS_FTP_PATH` = `/Gubernis/`
+
+5. **Push.** Once 1–4 are in place: `git push origin main` → workflow runs → site goes live.
+
+**Useful pre-push sanity check:** open the local `index.html` in a browser (`file:///…/gubernis-website/index.html`), submit a test through the form. Formspree accepts cross-origin posts, so this proves the form wiring works before the IONOS deploy.
+
+**Engine side (not blocked):** the Gubernis scheduler is live in Railway (commit `fd678e0` on `pragticality/main`). Daily ingest batch runs at 03:30 UTC. Watch counter values on the marketing site can be updated from real engine counts after the next batch fires.
+
+---
+
 ## Where this repo sits
 
 | | Location |
