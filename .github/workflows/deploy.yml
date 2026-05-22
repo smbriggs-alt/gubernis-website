@@ -24,7 +24,7 @@ jobs:
 
       - name: Stage deployable files
         # Public site files only. Repo-internal files (.git, README,
-        # CLAUDE.md, SESSION_START.md, .github/) are NOT deployed.
+        # CLAUDE.md, SESSION_START.md, .github/, scripts/) are NOT deployed.
         run: |
           mkdir -p dist
           cp index.html styles.css favicon.svg robots.txt sitemap.xml dist/
@@ -34,6 +34,16 @@ jobs:
           # present, fail silently if none.
           cp google*.html dist/ 2>/dev/null || true
           cp BingSiteAuth.xml dist/ 2>/dev/null || true
+
+      - name: Patch Watch counter with live engine numbers
+        # Calls the public /gubernis/watch-counter JSON endpoint on the
+        # Railway-hosted FastAPI app and substitutes the ledger values
+        # into dist/index.html. Fail-soft — if the endpoint is unreachable
+        # the deploy proceeds with whatever numbers are baked into the repo.
+        run: |
+          python3 scripts/patch_watch_counter.py \
+            --endpoint https://pragticality-production.up.railway.app/gubernis/watch-counter \
+            --html dist/index.html
 
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
