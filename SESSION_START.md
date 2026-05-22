@@ -35,19 +35,7 @@ deployed to IONOS, waitlist working end-to-end.
 
 **Follow-ups worth doing when you pick this up:**
 
-1. **Watch counter auto-refresh.** Wire a `/gubernis/watch-counter`
-   JSON endpoint on the Railway FastAPI app that returns current
-   counts. Then either (a) have the deploy workflow `curl` that
-   endpoint and `sed`-patch index.html before lftp upload, or (b)
-   add a client-side `fetch()` in index.html that calls the endpoint
-   on page load. (b) is more dynamic but adds CORS surface. (a)
-   freezes the numbers per-deploy but is simpler. ~30 minutes either
-   way.
-2. **HTTPS verification.** Run `curl -I https://gubernis.com` and
-   confirm `200 OK` with a valid Let's Encrypt cert. If not, check
-   the IONOS SSL panel for the gubernis.com cert status and trigger
-   re-issue if needed.
-3. **"What changed this week" cards.** The current three cards are
+1. **"What changed this week" cards.** The current three cards are
    strong illustrative copy. As real, narrative-strong changes flow
    in, replace with actual ingested items (e.g. real OFAC SDN delta
    entries, real EU CFSP decisions). Refresh maybe weekly.
