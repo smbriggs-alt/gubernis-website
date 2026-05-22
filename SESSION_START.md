@@ -35,10 +35,48 @@ deployed to IONOS, waitlist working end-to-end.
 
 **Follow-ups worth doing when you pick this up:**
 
-1. **"What changed this week" cards.** The current three cards are
-   strong illustrative copy. As real, narrative-strong changes flow
-   in, replace with actual ingested items (e.g. real OFAC SDN delta
-   entries, real EU CFSP decisions). Refresh maybe weekly.
+0. **🔴 Legal / compliance items for the marketing site.** Now that
+   gubernis.com is live and collecting email addresses via the waitlist
+   form, the following legally-load-bearing pieces are missing and
+   should be in place before any broad outreach:
+   - **Privacy policy** — what data we collect (email + IP at the
+     Formspree layer), why, how long we keep it, who we share it with
+     (= no one), how to request deletion. UK GDPR Article 13/14
+     requirements at the point of collection.
+   - **Terms / early-access list T&Cs** — what subscribing implies
+     (no commitment, can unsubscribe, "we'll write back when the free
+     tier opens"). The current cta-note is a half-step toward this.
+   - **Companies House footer disclosure** — UK Companies Act 2006
+     requires limited companies to disclose registered name, company
+     number, and registered office on any "business letter, order
+     form, website" (s.82). Footer currently says "A Pragticality Ltd
+     product" but not the company number or registered office.
+   - **Cookie posture** — currently the site sets no cookies. A
+     one-line statement to that effect helps customer trust and
+     forestalls the cookie-banner clutter. If/when analytics get
+     added (Plausible, Fathom, etc.), revisit.
+   Probably 1–2 hours of work if you draft, an hour if you adapt
+   from pragticality.com's existing privacy/terms (if those exist).
+
+1. **"What changed this week" cards refresh.** A helper script is
+   wired up — `scripts/refresh_this_week_cards.py` — that fetches
+   recent trade-relevant ingests from the Railway engine's
+   `/gubernis/recent-changes` endpoint, prints a numbered candidate
+   list, lets you pick 3, prompts for a custom summary per pick, and
+   rewrites the `.featured-grid` block in index.html in place. Run
+   weekly during the marketing push:
+
+   ```
+   cd gubernis-website
+   python3 scripts/refresh_this_week_cards.py
+   # — pick 3, write a sentence each, review with `git diff`
+   git commit -am "this-week: refresh cards"
+   git push    # → auto-deploys, picks up live Watch-counter too
+   ```
+
+   The script needs no env vars; the endpoint is public read-only.
+   Defaults to 10 candidates from the last 7 days. Override with
+   `--limit 20 --days 14` if the week was quiet.
 
 ---
 
