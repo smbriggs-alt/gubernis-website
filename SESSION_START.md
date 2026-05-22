@@ -35,28 +35,53 @@ deployed to IONOS, waitlist working end-to-end.
 
 **Follow-ups worth doing when you pick this up:**
 
-0. **🔴 Legal / compliance items for the marketing site.** Now that
-   gubernis.com is live and collecting email addresses via the waitlist
-   form, the following legally-load-bearing pieces are missing and
-   should be in place before any broad outreach:
-   - **Privacy policy** — what data we collect (email + IP at the
-     Formspree layer), why, how long we keep it, who we share it with
-     (= no one), how to request deletion. UK GDPR Article 13/14
-     requirements at the point of collection.
-   - **Terms / early-access list T&Cs** — what subscribing implies
-     (no commitment, can unsubscribe, "we'll write back when the free
-     tier opens"). The current cta-note is a half-step toward this.
-   - **Companies House footer disclosure** — UK Companies Act 2006
-     requires limited companies to disclose registered name, company
-     number, and registered office on any "business letter, order
-     form, website" (s.82). Footer currently says "A Pragticality Ltd
-     product" but not the company number or registered office.
-   - **Cookie posture** — currently the site sets no cookies. A
-     one-line statement to that effect helps customer trust and
-     forestalls the cookie-banner clutter. If/when analytics get
-     added (Plausible, Fathom, etc.), revisit.
-   Probably 1–2 hours of work if you draft, an hour if you adapt
-   from pragticality.com's existing privacy/terms (if those exist).
+0. **🔴 Legal / IP-protection items for the marketing site — drafted
+   in-house, hosted on gubernis.com, NOT outsourced to a third-party
+   legal-SaaS (Termly/Iubenda/etc.) or to an external law firm.**
+   Stephen's discipline 2026-05-22: keep the drafting chain internal
+   to maintain IP control, accepting that a bespoke-but-not-firm-
+   vetted set is acceptable risk at this stage. The goal is twofold —
+   meet the regulatory minimum for collecting emails / running a
+   limited-company website, AND contractually protect what we're
+   building.
+
+   **A. Regulatory minimum (UK GDPR + Companies Act 2006):**
+   - **Privacy policy** — what we collect (email + IP via Formspree),
+     why, retention, who we share with (= no one), deletion request
+     route. Article 13/14 disclosures at point of collection.
+   - **Companies House footer disclosure** — s.82 requires registered
+     name, company number, registered office on every page. Footer
+     currently has "A Pragticality Ltd product" only; add company
+     number and registered office.
+   - **Cookie posture** — one-line "this site sets no cookies"
+     statement; revisit if/when analytics added (Plausible/Fathom
+     are the privacy-first candidates).
+
+   **B. Watch Forward / Watch Ahead-specific terms (IP + contractual):**
+   The premium pipeline tier (£1,800/mo) is where the real IP exposure
+   is — pipeline-stage data is the differentiated signal. Terms must:
+   - **Protect the engine + curation + methodology as Pragticality IP.**
+     Customers get a licence to use, not ownership of what they see.
+   - **Prohibit reselling, redistribution, scraping, syndication.**
+     No turning a Gubernis subscription into a feed that customers
+     then re-vend to their own clients without a separate licence.
+   - **Prohibit derivative competing products.** Customers can't use
+     the pipeline outputs to build their own regulatory-watch product.
+   - **Seat-bound use only.** Watch Forward is up to 5 named users;
+     terms make this enforceable, not just an honour-system limit.
+   - **No client retransmission.** Compliance teams using Gubernis
+     internally is fine; embedding Gubernis output verbatim into their
+     client deliverables is not, without a separate redistribution
+     licence (an add-on we can sell later).
+
+   **C. General Subscription Agreement / EULA** covering all tiers:
+   acceptable use, no reverse engineering, termination, limitation of
+   liability, governing law (England & Wales), dispute resolution.
+
+   Estimated effort: 4–6 hours of drafting with Claude assistance,
+   then careful read-throughs. Ship before any broad outreach.
+   Worth considering an informal review by a lawyer-friend (NOT a
+   billable engagement) for sanity-check before publishing.
 
 1. **"What changed this week" cards refresh.** A helper script is
    wired up — `scripts/refresh_this_week_cards.py` — that fetches
