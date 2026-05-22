@@ -1,0 +1,16 @@
+# gubernis.com — Apache rewrite rules
+#
+# One rule, two conditions joined by OR:
+#   - Force HTTPS for any plaintext request
+#   - Canonicalise host to apex (gubernis.com, no www)
+#
+# Any request that is either over HTTP, OR on www.gubernis.com, gets
+# 301'd to https://gubernis.com/{path}. A direct https://gubernis.com
+# request matches neither condition and passes straight through to the
+# static files.
+
+RewriteEngine On
+
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\.gubernis\.com$ [NC]
+RewriteRule ^(.*)$ https://gubernis.com/$1 [L,R=301]
