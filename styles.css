@@ -787,6 +787,24 @@ a { color: var(--oxblood); text-decoration: none; }
   color: var(--slate);
 }
 .footer-bottom em { color: var(--oxblood); font-style: italic; }
+.footer-bottom .footer-meta {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+}
+.footer-bottom .footer-meta a {
+  color: var(--slate);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--line);
+  padding-bottom: 1px;
+}
+.footer-bottom .footer-meta a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+.footer-bottom .footer-meta .sep {
+  color: var(--line);
+}
 
 /* ────────────────────────────────────────────
    Responsive
