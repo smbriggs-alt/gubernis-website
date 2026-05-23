@@ -30,6 +30,11 @@ jobs:
           cp index.html styles.css favicon.svg robots.txt sitemap.xml dist/
           # Apache .htaccess for HTTPS + apex canonicalisation.
           cp .htaccess dist/ 2>/dev/null || true
+          # Legal pages (privacy, terms, etc.) — recursive copy of any
+          # top-level subdirectory that holds public legal/policy content.
+          for dir in privacy terms about; do
+            if [ -d "$dir" ]; then cp -r "$dir" dist/; fi
+          done
           # Search-engine verification files at repo root — match any
           # present, fail silently if none.
           cp google*.html dist/ 2>/dev/null || true
