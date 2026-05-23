@@ -35,53 +35,36 @@ deployed to IONOS, waitlist working end-to-end.
 
 **Follow-ups worth doing when you pick this up:**
 
-0. **🔴 Legal / IP-protection items for the marketing site — drafted
-   in-house, hosted on gubernis.com, NOT outsourced to a third-party
-   legal-SaaS (Termly/Iubenda/etc.) or to an external law firm.**
-   Stephen's discipline 2026-05-22: keep the drafting chain internal
-   to maintain IP control, accepting that a bespoke-but-not-firm-
-   vetted set is acceptable risk at this stage. The goal is twofold —
-   meet the regulatory minimum for collecting emails / running a
-   limited-company website, AND contractually protect what we're
-   building.
+0. ~~Legal / IP-protection items~~ — **DONE 2026-05-23.** Phase 1
+   (privacy notice at `/privacy/`) shipped commit `903a11b`. Phase 2
+   (subscription agreement at `/terms/`) shipped commit `7ed2e81`.
+   Footer + Companies House disclosure + ICO ZC134066 in place across
+   all three pages. Named contacts: `privacy@gubernis.com` (UK GDPR
+   data-subject requests), `legal@gubernis.com` (legal notices,
+   complaints). Watch Forward / Pipeline Content IP-protection
+   clauses are in §8 of the terms — named-seat enforcement, no
+   verbatim client retransmission, no syndication, no derivative
+   database, 1-yr confidentiality survival.
 
-   **A. Regulatory minimum (UK GDPR + Companies Act 2006):**
-   - **Privacy policy** — what we collect (email + IP via Formspree),
-     why, retention, who we share with (= no one), deletion request
-     route. Article 13/14 disclosures at point of collection.
-   - **Companies House footer disclosure** — s.82 requires registered
-     name, company number, registered office on every page. Footer
-     currently has "A Pragticality Ltd product" only; add company
-     number and registered office.
-   - **Cookie posture** — one-line "this site sets no cookies"
-     statement; revisit if/when analytics added (Plausible/Fathom
-     are the privacy-first candidates).
-
-   **B. Watch Forward / Watch Ahead-specific terms (IP + contractual):**
-   The premium pipeline tier (£1,800/mo) is where the real IP exposure
-   is — pipeline-stage data is the differentiated signal. Terms must:
-   - **Protect the engine + curation + methodology as Pragticality IP.**
-     Customers get a licence to use, not ownership of what they see.
-   - **Prohibit reselling, redistribution, scraping, syndication.**
-     No turning a Gubernis subscription into a feed that customers
-     then re-vend to their own clients without a separate licence.
-   - **Prohibit derivative competing products.** Customers can't use
-     the pipeline outputs to build their own regulatory-watch product.
-   - **Seat-bound use only.** Watch Forward is up to 5 named users;
-     terms make this enforceable, not just an honour-system limit.
-   - **No client retransmission.** Compliance teams using Gubernis
-     internally is fine; embedding Gubernis output verbatim into their
-     client deliverables is not, without a separate redistribution
-     licence (an add-on we can sell later).
-
-   **C. General Subscription Agreement / EULA** covering all tiers:
-   acceptable use, no reverse engineering, termination, limitation of
-   liability, governing law (England & Wales), dispute resolution.
-
-   Estimated effort: 4–6 hours of drafting with Claude assistance,
-   then careful read-throughs. Ship before any broad outreach.
-   Worth considering an informal review by a lawyer-friend (NOT a
-   billable engagement) for sanity-check before publishing.
+   **Future work on the legal stack** (low urgency now that the floor
+   is laid):
+   - **Informal lawyer-friend review.** Worth getting a sanity-check
+     read-through from a UK B2B-SaaS lawyer-friend (NOT a billable
+     engagement, per Stephen's in-house drafting discipline). Look
+     specifically at the liability cap, governing law, and §8
+     enforcement clauses.
+   - **Data Processing Addendum (DPA).** Stub-referenced in §15 of
+     the terms but not actually written. Only needed when a customer
+     puts us in a processor relationship — i.e. they provide us
+     personal data to process on their behalf. Today none of the
+     tiers contemplate that.
+   - **Acceptable Use Policy.** Currently the prohibitions live in
+     §7 of terms. If the misuse landscape gets richer (e.g. specific
+     scraping patterns emerge), break out into a separate AUP linked
+     from §7.
+   - **`security.txt` + `security@gubernis.com`.** When set up.
+     Standard B2B SaaS hygiene; complements the terms' breach-
+     notification expectation in §10.
 
 1. **"What changed this week" cards refresh.** A helper script is
    wired up — `scripts/refresh_this_week_cards.py` — that fetches
