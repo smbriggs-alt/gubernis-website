@@ -35,6 +35,9 @@ jobs:
           for dir in privacy terms about; do
             if [ -d "$dir" ]; then cp -r "$dir" dist/; fi
           done
+          # RFC 9116 security.txt — published at /.well-known/security.txt
+          # so vulnerability researchers know where to report.
+          if [ -d ".well-known" ]; then cp -r .well-known dist/; fi
           # Search-engine verification files at repo root — match any
           # present, fail silently if none.
           cp google*.html dist/ 2>/dev/null || true

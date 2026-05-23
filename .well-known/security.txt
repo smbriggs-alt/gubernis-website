@@ -1,0 +1,8 @@
+# Gubernis vulnerability disclosure
+# Per RFC 9116. Reports to security@gubernis.com.
+
+Contact: mailto:security@gubernis.com
+Expires: 2027-05-23T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://gubernis.com/.well-known/security.txt
+Policy: https://gubernis.com/terms/
