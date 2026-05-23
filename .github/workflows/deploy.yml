@@ -30,9 +30,10 @@ jobs:
           cp index.html styles.css favicon.svg robots.txt sitemap.xml dist/
           # Apache .htaccess for HTTPS + apex canonicalisation.
           cp .htaccess dist/ 2>/dev/null || true
-          # Legal pages (privacy, terms, etc.) — recursive copy of any
-          # top-level subdirectory that holds public legal/policy content.
-          for dir in privacy terms about; do
+          # Legal pages (privacy, terms, etc.) + sample dispatches —
+          # recursive copy of any top-level subdirectory holding public
+          # static content.
+          for dir in privacy terms about samples; do
             if [ -d "$dir" ]; then cp -r "$dir" dist/; fi
           done
           # RFC 9116 security.txt — published at /.well-known/security.txt
