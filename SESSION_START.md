@@ -116,6 +116,20 @@ search engines verified.
      `/.well-known/security.txt` per RFC 9116. The
      `security@gubernis.com` mailbox itself is still TBC.
 
+4. **Doc-25 Workstream A — Tier 2 wave (cross-repo coordination, deferred).**
+   Three files in this repo call the Railway-hosted Gnomon-engine hostname
+   `pragticality-production.up.railway.app` for Gubernis endpoints:
+   `scripts/refresh_this_week_cards.py` (calls `/gubernis/recent-changes`),
+   `.github/workflows/deploy.yml` (calls `/gubernis/watch-counter` at every
+   deploy), and `scripts/patch_watch_counter.py` (same). As of 2026-05-24,
+   Tier 1 of doc-25 landed (user-visible strings Gnomon-branded in the
+   backend) but the hostname is unchanged. The Tier 2 wave plans a custom
+   domain `app.gnomon.info` on the Railway service, after which all three
+   of this repo's callers must be updated together. See
+   `pragticality/docs/state_of_codebase.md` Section 13 "Doc-25 Workstream A
+   — Tier 2 wave" for the full coordinated sequence. Don't update the URLs
+   here in isolation.
+
 ---
 
 ## Where this repo sits
