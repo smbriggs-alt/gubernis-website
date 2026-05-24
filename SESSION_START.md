@@ -2,10 +2,11 @@
 
 Quick orientation for picking up work on this repo. Read `README.md` and `CLAUDE.md` for the substance; this file is just for the *what now* question.
 
-## ✅ Live — as of 2026-05-21
+## ✅ Live — as of 2026-05-24
 
 **gubernis.com is live.** Engine running daily on Railway, marketing site
-deployed to IONOS, waitlist working end-to-end.
+deployed to IONOS, waitlist working end-to-end, legal floor in place,
+search engines verified.
 
 **What's wired up:**
 
@@ -24,30 +25,79 @@ deployed to IONOS, waitlist working end-to-end.
 - Form: Formspree endpoint `https://formspree.io/f/xwvzopqy` wired into
   `#sign-up`. Submissions land in the Formspree dashboard and forward
   to Stephen's email. End-to-end tested 2026-05-21.
-- Watch counter: numbers refreshed from real engine data on
-  2026-05-21 (24 changes today / 31 last 7d / 407 docs tracked / 11
-  sources / § 8 ambiguity flags). Manual refresh for now — see the
-  follow-up below.
-- SSL: Let's Encrypt cert via IONOS — provisioning kicked off when
-  domain was connected. May still be propagating through their edge
-  even after IONOS marks it "issued" (their platform had system
-  issues 2026-05-21). HTTP works regardless.
+- Watch counter: **auto-patched at deploy time** from the live engine's
+  public `/gubernis/watch-counter` endpoint (`scripts/patch_watch_counter.py`
+  runs in the deploy workflow). Fail-soft — if the endpoint is
+  unreachable, deploy proceeds with whatever numbers are baked into the
+  repo. The numbers in `index.html` source are therefore stale by
+  design; what's served is always fresh.
+- HTTPS canonicalisation: `.htaccess` forces HTTPS + apex (strips
+  `www.`). SSL cert provisioned via Let's Encrypt at IONOS.
+- Samples: five Watch Forward sample dispatches live at `/samples/`.
+  Marked explicitly as illustrative (commit `eae22ed` rewrote the
+  earlier fabricated ambiguity flags after a traceability review —
+  every claim now ties to a real ingest or primary source, or is
+  labelled illustrative).
+- Search engines: Google Search Console verified; sitemap
+  (`/privacy/`, `/terms/`, `/samples/` included) submitted.
+- Security disclosure: RFC 9116 `security.txt` published at
+  `/.well-known/security.txt`.
+- Legal floor: privacy notice at `/privacy/` (commit `903a11b`),
+  subscription agreement at `/terms/` (commit `7ed2e81`). Footer
+  carries Companies House No. 17207406 + ICO ZC134066 + Privacy +
+  Terms links. Named contacts: `privacy@gubernis.com` (UK GDPR
+  data-subject requests), `legal@gubernis.com` (legal notices,
+  complaints). Watch Forward IP-protection clauses in §8 of the
+  terms — named-seat enforcement, no verbatim client retransmission,
+  no syndication, no derivative database, 1-yr confidentiality
+  survival.
 
 **Follow-ups worth doing when you pick this up:**
 
-0. ~~Legal / IP-protection items~~ — **DONE 2026-05-23.** Phase 1
-   (privacy notice at `/privacy/`) shipped commit `903a11b`. Phase 2
-   (subscription agreement at `/terms/`) shipped commit `7ed2e81`.
-   Footer + Companies House disclosure + ICO ZC134066 in place across
-   all three pages. Named contacts: `privacy@gubernis.com` (UK GDPR
-   data-subject requests), `legal@gubernis.com` (legal notices,
-   complaints). Watch Forward / Pipeline Content IP-protection
-   clauses are in §8 of the terms — named-seat enforcement, no
-   verbatim client retransmission, no syndication, no derivative
-   database, 1-yr confidentiality survival.
+1. **Automate "What changed this week" cards (goal, not built).** Watch-counter
+   numbers are already auto-patched at deploy from the live engine.
+   Cards are not — they're still editorial via the interactive picker
+   in `scripts/refresh_this_week_cards.py`. The goal is to **automate
+   card selection with firm rules** so the homepage doesn't go stale
+   between manual refreshes. Open design questions to settle before
+   building:
+   - **Selection ruleset.** What counts as "newsworthy this week"?
+     Combination of: ambiguity-flagged > substantive > other; jurisdiction
+     balance (don't show three EU items if a US or UK alternative is
+     comparable); topic spread (don't show three sanctions stories);
+     freshness (last N days, configurable); de-dupe against identities
+     already shown in the previous N rotations.
+   - **Summary generation.** Hard problem — `feedback_dispatch_
+     traceability.md` forbids fabricated specifics. Options: (a) use
+     the engine's own structured fields (issuing agency, severity,
+     ambiguity reason, affected HS chapters where available) to build
+     templated summaries that cite the source; (b) LLM-draft against a
+     constrained prompt that's only allowed to paraphrase the title +
+     structured fields, never invent. Either way, a "no fabrication"
+     contract is the load-bearing constraint.
+   - **Human-in-the-loop or not.** Cron + auto-commit? Cron + open a
+     PR for approval? Daily auto-commit with weekly human override?
+     The dispatch-traceability rule probably argues for at least a
+     review checkpoint before the page changes.
+   - **Cadence.** Daily refresh? Weekly? Triggered by ambiguity-flag
+     volume?
 
-   **Future work on the legal stack** (low urgency now that the floor
-   is laid):
+2. **Manual cards refresh in the meantime.** Until item 1 lands, run
+   the picker weekly during the marketing push:
+
+   ```
+   cd gubernis-website
+   python3 scripts/refresh_this_week_cards.py
+   # — pick 3, write a sentence each, review with `git diff`
+   git commit -am "this-week: refresh cards"
+   git push    # → auto-deploys, picks up live Watch-counter too
+   ```
+
+   The script needs no env vars; the endpoint is public read-only.
+   Defaults to 10 candidates from the last 7 days. Override with
+   `--limit 20 --days 14` if the week was quiet.
+
+3. **Legal stack — future work** (low urgency, the floor is laid):
    - **Informal lawyer-friend review.** Worth getting a sanity-check
      read-through from a UK B2B-SaaS lawyer-friend (NOT a billable
      engagement, per Stephen's in-house drafting discipline). Look
@@ -62,29 +112,9 @@ deployed to IONOS, waitlist working end-to-end.
      §7 of terms. If the misuse landscape gets richer (e.g. specific
      scraping patterns emerge), break out into a separate AUP linked
      from §7.
-   - **`security.txt` + `security@gubernis.com`.** When set up.
-     Standard B2B SaaS hygiene; complements the terms' breach-
-     notification expectation in §10.
-
-1. **"What changed this week" cards refresh.** A helper script is
-   wired up — `scripts/refresh_this_week_cards.py` — that fetches
-   recent trade-relevant ingests from the Railway engine's
-   `/gubernis/recent-changes` endpoint, prints a numbered candidate
-   list, lets you pick 3, prompts for a custom summary per pick, and
-   rewrites the `.featured-grid` block in index.html in place. Run
-   weekly during the marketing push:
-
-   ```
-   cd gubernis-website
-   python3 scripts/refresh_this_week_cards.py
-   # — pick 3, write a sentence each, review with `git diff`
-   git commit -am "this-week: refresh cards"
-   git push    # → auto-deploys, picks up live Watch-counter too
-   ```
-
-   The script needs no env vars; the endpoint is public read-only.
-   Defaults to 10 candidates from the last 7 days. Override with
-   `--limit 20 --days 14` if the week was quiet.
+   - ~~`security.txt`~~ — **DONE** (commit `9d272f8`). Published at
+     `/.well-known/security.txt` per RFC 9116. The
+     `security@gubernis.com` mailbox itself is still TBC.
 
 ---
 
@@ -93,7 +123,7 @@ deployed to IONOS, waitlist working end-to-end.
 | | Location |
 |---|---|
 | This repo (the marketing site) | `gubernis-website/` |
-| The engine | `pragticality/gubernis/` (on `gubernis-poc` branch) |
+| The engine | `pragticality/gubernis/` (on `main` as of 2026-05-21, commit `f73bf05`) |
 | The strategic docs | `pragticality-docs/gubernis/` |
 | The holding-co site (sibling) | `pragticality-website/` |
 | The other product site (sibling) | `gnomon-website/` |
@@ -108,31 +138,29 @@ deployed to IONOS, waitlist working end-to-end.
 
 ## Deploying
 
-The `gubernis.com` domain was registered 2026-05-12. Host setup is pending. When deployment lands, two probable paths:
+Deploy is live and automated. Push to `main` → GitHub Actions
+(`.github/workflows/deploy.yml`) runs lftp over SFTP to IONOS. See the
+"What's wired up" section at the top for hosting / DNS / SFTP details.
 
-### Option A — IONOS (same pattern as `pragticality.com`)
+What happens on each push:
 
-The Pragticality Ltd holding-company site is hosted on IONOS and deployed via GitHub Actions (workflow at `pragticality-website/.github/workflows/deploy.yml`). Same approach could apply here:
+1. Stage public files (`index.html`, `styles.css`, legal pages,
+   `samples/`, `.well-known/`, sitemap, etc.) into `dist/`.
+2. Patch the Watch counter in `dist/index.html` from the live engine's
+   `/gubernis/watch-counter` endpoint (`scripts/patch_watch_counter.py`,
+   fail-soft).
+3. lftp mirror `dist/` to the IONOS chroot root (no `--delete` — manually
+   placed files like Google verification HTML and Let's Encrypt
+   challenges are left alone).
 
-1. Set DNS for `gubernis.com` to IONOS
-2. Add `IONOS_FTP_HOST`, `IONOS_FTP_USER`, `IONOS_FTP_PASS` secrets to this repo on GitHub
-3. Add a `.github/workflows/deploy.yml` analogous to the one in `pragticality-website` (lftp-based SFTP push to IONOS document root)
-4. Push to `main` triggers deploy
+Search-engine and canonicalisation setup are already done:
+- Google Search Console — verified (HTML file at repo root).
+- Sitemap — `sitemap.xml` includes `/privacy/`, `/terms/`, `/samples/`.
+- `.htaccess` — forces HTTPS, canonicalises `www.gubernis.com` → apex.
 
-### Option B — Fasthosts (same pattern as `gnomon.info` was meant to)
-
-The Gnomon marketing site was scoped to deploy to Fasthosts per `gnomon-website/DEPLOY.md`. Same registrar may apply to `gubernis.com` (it was registered there too — confirm via `whois gubernis.com`). If so:
-
-1. Configure Fasthosts hosting for `gubernis.com`
-2. Upload repo contents via SFTP / FileZilla / lftp
-3. Verify `https://gubernis.com/` and `https://gubernis.com/sitemap.xml`
-
-### Either way
-
-- After deploy, submit `sitemap.xml` to Google Search Console (URL-prefix property; HTML file verification method like `pragticality.com` used)
-- Set up Bing Webmaster Tools via "Import from Google"
-- Add `Organization` JSON-LD to `<head>` (optional SEO refinement; deferred)
-- Configure `www → root` 301 redirect at the DNS / host level
+Outstanding deploy-adjacent items:
+- Bing Webmaster Tools — set up via "Import from Google" (deferred).
+- `Organization` JSON-LD in `<head>` — optional SEO refinement (deferred).
 
 ## What to do first when picking this up
 
@@ -148,18 +176,39 @@ The Gnomon marketing site was scoped to deploy to Fasthosts per `gnomon-website/
 
 ### Refreshing the Watch counter
 
-Numbers in `index.html` lines around the `.ledger-grid` are placeholders. To refresh:
+Don't. It's auto-patched at deploy time from the live engine's public
+`/gubernis/watch-counter` endpoint (`scripts/patch_watch_counter.py`,
+called from the deploy workflow). The numbers in `index.html` source
+are intentionally stale; what's served is fresh on every push.
 
-- Get current counts from the engine: `python3 -m gubernis.scripts.inspect_store` (in the `pragticality` repo on `gubernis-poc` branch) — provides total docs by source
-- Compute today / 7d / 28d windows
-- Update the `<div class="ledger-number">` values in the five cells
-- Update the `ledger-time` text to current time
-
-Or wire up a small endpoint and fetch dynamically — V2 work.
+If the deployed numbers look wrong, debug the endpoint, not the HTML:
+```
+curl -s https://pragticality-production.up.railway.app/gubernis/watch-counter | python3 -m json.tool
+```
 
 ### Refreshing the "What changed this week" cards
 
-Run `python3 -m gubernis.scripts.inspect_store --list --limit 10` in the engine repo to see recent ingests. Pick the three most substantive and update the three cards in `index.html` (around the `featured-grid` section).
+Currently manual / editorial. Use the picker:
+
+```
+cd gubernis-website
+python3 scripts/refresh_this_week_cards.py
+# — pick 3, write a sentence each, review with `git diff`
+git commit -am "this-week: refresh cards"
+git push    # → auto-deploys, picks up live Watch-counter too
+```
+
+The script fetches from `/gubernis/recent-changes` (public, no auth).
+Defaults to 10 candidates from the last 7 days; override with
+`--limit 20 --days 14` if the week was quiet.
+
+Per `feedback_dispatch_traceability.md`, summary copy must tie to the
+real ingest — no fabricated specifics. The script's interactive prompt
+makes this explicit ("editorial pick step" is the whole point of
+keeping it human).
+
+Automation of this step is a stated goal — see follow-up #1 at the
+top of this file.
 
 ### Adding a new section
 
@@ -170,11 +219,19 @@ Run `python3 -m gubernis.scripts.inspect_store --list --limit 10` in the engine 
 
 ### Adjusting pricing tiers
 
-Pricing is in the `.pricing-grid` section. Four tiers: Free Watch / Starter / **Pro (recommended)** / Enterprise. The Ambiguity Watch sits in Pro as the upgrade gate — be deliberate about moving it.
+Pricing is in the `.pricing-grid` section. **Five tiers** (as of
+2026-05-24): Free Watch (£0) / Starter (£200) / Pro (£800) /
+**Watch Forward (£1,800)** / Enterprise (£30k+/yr). The Ambiguity
+Watch sits in Pro as the upgrade gate; Watch Forward adds
+pipeline-tracking on top. Watch Forward at £21,600/yr sits ~£3.4k
+under the £25k procurement-threshold from
+`feedback_procurement_threshold_pricing.md` — adding features that
+push the price up risks crossing into procurement-friction land.
 
 ## What this session is NOT for
 
-- Implementing the engine — that's the `pragticality` repo, `gubernis-poc` branch.
+- Implementing the engine — that's the `pragticality` repo, on `main`
+  branch (in `gubernis/`).
 - Strategic direction — that's `pragticality-docs/gubernis/`.
 - Building a blog / multi-page expansion — deferred until V1 is validated.
 - Adding tracking / analytics without explicit privacy review.
@@ -186,6 +243,9 @@ If you're Claude Code, the following auto-memory entries are load-bearing for th
 
 - `feedback_gubernis_customer_copy.md` — never describe mechanism in customer copy
 - `feedback_marketing_claim_defensibility.md` — no unsupported competitive claims
+- `feedback_dispatch_traceability.md` — no fabricated specifics in cards / Watch Forward dispatches; every claim cites engine ingest or primary source
+- `feedback_procurement_threshold_pricing.md` — keep wedge-tier annual spend below £25k
+- `feedback_gubernis_scope_discipline.md` — goods-affecting regulation only; not insurance, sales tax, freight
 - `feedback_drive_terminal_ops.md` — drive multi-step terminal work via Bash tool, don't paste copy-paste lists
 - `feedback_ground_rules.md` — ask before push / deploy / delete
 
