@@ -26,15 +26,29 @@ import urllib.error
 import urllib.request
 
 
+def _format_as_of(ts: str) -> str:
+    """Format ISO-8601 timestamp from the endpoint as '25 May 2026 15:14 UTC'
+    for display. The endpoint's as_of is the moment the response was generated
+    (effectively deploy time). Falls back to first 16 chars if parsing fails."""
+    from datetime import datetime
+    try:
+        clean = ts.replace("Z", "").split(".")[0]
+        dt = datetime.fromisoformat(clean)
+        return dt.strftime("%d %b %Y %H:%M UTC")
+    except (ValueError, AttributeError):
+        return (ts or "")[:16] or "—"
+
+
 # Map the JSON field returned by the endpoint to the data-count attribute
-# value in index.html, plus a formatter for the displayed number. Keep this
-# in sync with the ledger-cell structure in index.html.
+# value in index.html, plus a formatter for the displayed value. Keep this
+# in sync with the ledger-cell + ledger-label structures in index.html.
 FIELD_MAP = [
     ("changes_today",       "changes-today",       lambda n: str(n)),
     ("changes_7d",          "changes-7d",          lambda n: str(n)),
     ("documents_tracked",   "documents-tracked",   lambda n: str(n)),
     ("sources_watched",     "sources",             lambda n: str(n)),
     ("ambiguity_flags_7d",  "ambiguity-7d",        lambda n: f"&sect; {n}"),
+    ("as_of",               "as-of",               _format_as_of),
 ]
 
 
@@ -54,7 +68,10 @@ def fetch_counter(endpoint: str, timeout: float = 10.0) -> dict | None:
 
 
 def patch_html(html: str, counter: dict) -> tuple[str, list[str]]:
-    """Substitute values into the Watch ledger cells. Returns (new_html, notes)."""
+    """Substitute values into elements carrying a `data-count` attribute.
+    Returns (new_html, notes). Matches either `</div>` or `</span>` so the
+    same machinery can patch ledger-cell numbers and the ledger-label
+    timestamp (which is in a <span>)."""
     notes: list[str] = []
     out = html
     for json_field, attr_value, fmt in FIELD_MAP:
@@ -62,8 +79,8 @@ def patch_html(html: str, counter: dict) -> tuple[str, list[str]]:
             notes.append(f"  - {json_field}: missing from endpoint payload, left as-is")
             continue
         new_text = fmt(counter[json_field])
-        pattern = rf'(data-count="{re.escape(attr_value)}">)[^<]*(</div>)'
-        replacement = rf"\g<1>{new_text}\g<2>"
+        pattern = rf'(data-count="{re.escape(attr_value)}"[^>]*>)([^<]*)(</[a-z]+>)'
+        replacement = rf"\g<1>{new_text}\g<3>"
         new_out, count = re.subn(pattern, replacement, out)
         if count == 0:
             notes.append(f"  - data-count=\"{attr_value}\" marker not found in HTML")
