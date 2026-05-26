@@ -1,0 +1,138 @@
+# Expected-release cadence for the eleven watched sources.
+#
+# STAGING NOTE: this is an *engine* artifact parked in the marketing-site
+# repo so it can be versioned while we iterate. Final home is the Gubernis
+# engine (pragticality, gubernis-poc branch). It is NOT deployed to the
+# live site — the deploy workflow only ships index.html/styles.css and the
+# privacy/terms/about/samples dirs.
+#
+# Two consumers:
+#   1. The poller — `poll` blocks set how often / when to fetch each source.
+#   2. The document-watch absence detector (see document-watch.md) — the
+#      `cadence_type` + `overdue` + `statutory_clock` blocks tell it when a
+#      release is *expected*, so silence can be flagged.
+#
+# Times are tz-aware LOCAL times on purpose. Resolve against the named IANA
+# zone at runtime — do NOT bake to fixed UTC, or US/EU/UK DST transitions
+# (which don't align) will drift every window by an hour twice a year.
+
+version: 1
+
+# Working/sitting calendars the sources follow. The engine needs a holiday
+# + recess source for each (e.g. a published bank-holiday list, the Congress
+# session calendar, the UK parliamentary sitting calendar).
+calendars:
+  us_federal:    { tz: America/New_York, skip: us_federal_holidays }
+  eu_working:    { tz: Europe/Brussels,  skip: eu_institution_holidays }
+  uk:            { tz: Europe/London,    skip: uk_bank_holidays }
+  us_congress:   { tz: America/New_York, active_on: published_session_calendar }
+  uk_parliament: { tz: Europe/London,    active_on: published_sitting_calendar }
+
+sources:
+
+  # ---- Tier: scheduled working-day publishers (absence is meaningful) ----
+  federal_register:
+    label: "US Federal Register"
+    cadence_type: scheduled_working_days
+    calendar: us_federal
+    release_window_local: "08:45-11:00"      # public-inspection documents
+    poll: { times_local: ["12:00", "16:00"], working_days_only: true }
+    overdue: { flag_if_none_by_local: "13:00" }
+    notes: "Issue dated next working day; public-inspection docs are the live signal."
+
+  eur_lex:
+    label: "EUR-Lex / EU Official Journal"
+    cadence_type: scheduled_working_days
+    calendar: eu_working
+    release_window_local: "all-day"          # L (legislation) + C (information)
+    poll: { times_local: ["10:00", "18:00"], working_days_only: true }
+    overdue: { flag_if_none_by_local: "18:00" }
+    notes: "Multiple editions per working day is normal."
+
+  gov_uk_publications:
+    label: "UK gov.uk publications"
+    cadence_type: working_days_high_volume
+    calendar: uk
+    release_window_local: "all-day"          # official statistics fixed at 09:30
+    poll: { times_local: ["09:45", "13:00", "17:00"], working_days_only: true }
+    overdue: { flag_if_none_by_local: "12:00", severity: low }   # silence here usually means OUR pipeline broke
+    notes: "Very high volume; absence is a strong pipeline-health signal."
+
+  # ---- Tier: session/sitting-day publishers (quiet in recess is normal) ----
+  congress_bills:
+    label: "US Congress (trade bills)"
+    cadence_type: session_days
+    calendar: us_congress
+    release_window_local: "session-day"
+    poll: { times_local: ["18:00"], active_days_only: true, recess_safety_poll: weekly }
+    overdue: { flag_if_none_on_active_day: true, severity: low }
+    notes: "Bill text lags introduction ~1 day. Recess silence is expected, not a flag."
+
+  uk_parliament_bills:
+    label: "UK Parliament (trade bills)"
+    cadence_type: session_days
+    calendar: uk_parliament
+    release_window_local: "sitting-day"
+    poll: { times_local: ["18:00"], active_days_only: true, recess_safety_poll: weekly }
+    overdue: { flag_if_none_on_active_day: true, severity: low }
+    notes: "Sitting days ~Mon-Thu (+some Fri). Quiet in recess/prorogation is expected."
+
+  # ---- Tier: periodic tracker ----
+  eu_legislative_train:
+    label: "EU Legislative Train (INTA)"
+    cadence_type: periodic_monthly
+    calendar: eu_working
+    poll: { cron_local: "Mon 08:00" }        # weekly poll catches a ~monthly refresh promptly
+    overdue: { flag_if_stale_days: 35 }
+    notes: "A tracker, not a feed. ~1 refresh/month."
+
+  # ---- Tier: event-driven, high-impact (poll hard; absence NOT flagged) ----
+  ofac_sdn:
+    label: "OFAC SDN list"
+    cadence_type: event_driven
+    calendar: us_federal      # business-hours bound, but no holiday skip on designations
+    poll: { every_hours: 3, window_local: "08:00-18:00" }
+    overdue: null             # designations are unscheduled — watch presence, not absence
+    notes: "Designations cluster or go quiet. Lag here is the costliest, hence 3h polling."
+
+  eu_sanctions_consolidated:
+    label: "EU consolidated sanctions list"
+    cadence_type: event_driven
+    calendar: eu_working
+    poll: { every_hours: 3, window_local: "08:00-18:00" }
+    overdue: null
+    foresight: { signal: fac_council_meeting_calendar }   # partial: ramp polling around Council/FAC dates
+    notes: "Updates after each Council act amending measures lands in the OJ."
+
+  hmrc_trade_tariff_news:
+    label: "UK HMRC Tariff stop-press"
+    cadence_type: event_driven
+    calendar: uk
+    poll: { times_local: ["09:00", "16:00"], working_days_only: true }
+    overdue: null
+    notes: "Ad hoc stop-press notices within working hours."
+
+  # ---- Tier: event-driven with a statutory clock (the absence analog) ----
+  ustr_section_301:
+    label: "USTR Section 301"
+    cadence_type: event_driven_statutory
+    calendar: us_federal
+    poll: { times_local: ["10:00", "16:00"], working_days_only: true }
+    overdue: null
+    statutory_clock:
+      track: review_windows
+      review_cycle_years: 4          # four-year statutory reviews create foreseeable windows
+      also_track: [comment_period_deadlines, hearing_dates]
+    notes: "Episodic, but review cycles + comment deadlines are foreseeable; ramp polling near them."
+
+  bis_section_232:
+    label: "BIS Section 232"
+    cadence_type: event_driven_statutory
+    calendar: us_federal
+    poll: { times_local: ["10:00", "16:00"], working_days_only: true }
+    overdue: null
+    statutory_clock:
+      track: open_investigations
+      report_deadline_days: 270      # Commerce report due 270 days from initiation
+      action_deadline_days: 90       # presidential action due 90 days after report
+    notes: "Once an investigation opens, the 270+90 day clock gives foreseeable decision windows."
