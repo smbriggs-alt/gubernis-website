@@ -3,6 +3,14 @@ name: Deploy to IONOS
 on:
   push:
     branches: [main]
+  # Daily refresh so the Watch ledger (counter values + the "site snapshot"
+  # timestamp) stays current without a code push — the patch step below
+  # rewrites those at deploy time, so the site only moves when a deploy runs.
+  # 05:00 UTC sits after the engine's ~03:30–04:00 UTC daily cycle so the
+  # patched numbers are the day's fresh ones. GitHub only runs schedules on
+  # the default branch, so this is inert until merged to main.
+  schedule:
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 # Mirror of gnomon-website/.github/workflows/deploy.yml — same pattern, same
