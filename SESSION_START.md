@@ -2,6 +2,34 @@
 
 Quick orientation for picking up work on this repo. Read `README.md` and `CLAUDE.md` for the substance; this file is just for the *what now* question.
 
+## Working across machines — pull first, push last (read before touching anything)
+
+This repo is edited from more than one machine (Mac, mobile, web sessions). The
+**remote is the single source of truth**; a local checkout is only as fresh as
+its last pull. To avoid clobbering work done elsewhere:
+
+1. **Start of session — pull before you do anything.** Fast-forward both `main`
+   and the branch you'll work on, so you're building on the latest:
+   ```
+   git pull origin main
+   git pull origin <your-working-branch>
+   ```
+   A fresh web/cloud session clones the repo current — but `main` can still move
+   *underneath* a long session, so pull again if you've been idle.
+
+2. **While working — never `--force`.** A normal push is fast-forward-only: git
+   rejects it if another machine pushed in the meantime. A rejected push is the
+   safety net working — **fetch and reconcile, never force over it.** A
+   force-push is the only way to actually lose another machine's work.
+
+3. **End of session — push, then update this file.** Two non-negotiable closing
+   steps, in order:
+   - `git push` your branch so the next machine can pull it.
+   - **Update this `SESSION_START.md`** — what changed, what's now live, what's
+     left. This has long been the practice; it is now the rule. The session doc
+     is only trustworthy if every session leaves it current, so append to the
+     relevant section and never let it drift behind the code.
+
 ## ✅ Live — as of 2026-05-24
 
 **gubernis.com is live.** Engine running daily on Railway, marketing site
@@ -21,7 +49,9 @@ search engines verified.
   uses `lftp` over SFTP port 22. Mirror of the gnomon-website pattern.
   Three secrets in the repo: `IONOS_FTP_HOST`, `IONOS_FTP_USER`,
   `IONOS_FTP_PASS`. lftp uploads to `/` (chroot root IS `/Gubernis/`).
-  Every push to `main` redeploys.
+  Every push to `main` redeploys; a daily `0 5 * * *` UTC schedule also
+  redeploys, so the Watch counter + "site snapshot" timestamp stay current
+  without a push (landed 2026-05-26 via PR #1, commit `7882693`).
 - Form: Formspree endpoint `https://formspree.io/f/xwvzopqy` wired into
   `#sign-up`. Submissions land in the Formspree dashboard and forward
   to Stephen's email. End-to-end tested 2026-05-21.
