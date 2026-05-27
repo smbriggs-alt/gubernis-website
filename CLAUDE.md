@@ -91,7 +91,7 @@ Multi-page expansion (`/about/`, `/pricing/`, `/how-it-works/`) is deferred. Anc
 
 ## What this repo is not
 
-- The Gubernis engine itself — that's `gubernis/` inside [`pragticality`](https://github.com/smbriggs-alt/pragticality) (`gubernis-poc` branch).
+- The Gubernis engine itself — that's `gubernis/` inside [`pragticality`](https://github.com/Pragticality-ltd/pragticality) (merged to `main` 2026-05-21).
 - The Gubernis strategic docs — those live in `pragticality-docs/gubernis/`.
 - The Pragticality Ltd holding-company site — that's `pragticality-website`.
 - The Gnomon product site — that's `gnomon-website`.

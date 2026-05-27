@@ -2,7 +2,7 @@
 
 Source files for the **Gubernis** marketing website at [gubernis.com](https://gubernis.com).
 
-Static HTML/CSS — no build step, no JavaScript framework, no dependencies beyond Google Fonts. Sibling to [`pragticality-website`](https://github.com/smbriggs-alt/pragticality-website) (the holding-company site) and [`gnomon-website`](https://github.com/smbriggs-alt/gnomon-website) (the sibling product site).
+Static HTML/CSS — no build step, no JavaScript framework, no dependencies beyond Google Fonts. Sibling to [`pragticality-website`](https://github.com/Pragticality-ltd/pragticality-website) (the holding-company site) and [`gnomon-website`](https://github.com/Pragticality-ltd/gnomon-website) (the sibling product site).
 
 ## What Gubernis is
 
@@ -10,7 +10,7 @@ The regulatory watch for UK, EU, and US trade compliance. Surfaces what changed 
 
 Brand kernel: **Surfaces change. You decide.**
 
-Strategic context: `pragticality-docs/gubernis/` in the [`pragticality-docs`](https://github.com/smbriggs-alt/pragticality-docs) repo, particularly:
+Strategic context: `pragticality-docs/gubernis/` in the [`pragticality-docs`](https://github.com/Pragticality-ltd/pragticality-docs) repo, particularly:
 
 - `00_README.md` — what Gubernis is, naming rationale, relationship to Gnomon
 - `05_product_thesis.md` — Gubernis-as-product wedge → destination thesis
@@ -55,10 +55,10 @@ When deploying:
 
 ## What this isn't
 
-- **The Gubernis engine** — that's the `gubernis/` module in [`pragticality`](https://github.com/smbriggs-alt/pragticality) (currently on the `gubernis-poc` branch; not yet merged to main). 18+ commits of working code: connectors for US Federal Register, OFAC SDN, UK gov.uk, UK HMRC Trade Tariff, EU Consolidated Sanctions, and EUR-Lex; dual-LLM cross-check tagger; semantic diff engine; automated smoke test. See `pragticality-docs/gubernis/04_poc_report.md` for the PoC verdict.
+- **The Gubernis engine** — that's the `gubernis/` module in [`pragticality`](https://github.com/Pragticality-ltd/pragticality) (merged to `main` 2026-05-21; daily scheduler live on Railway). Connectors for US Federal Register, OFAC SDN, UK gov.uk, UK HMRC Trade Tariff, EU Consolidated Sanctions, EUR-Lex, USTR Section 301, BIS Section 232, US Congress, EU Legislative Train, UK Parliament; dual-LLM cross-check tagger; semantic diff engine; automated smoke test. See `pragticality-docs/gubernis/04_poc_report.md` for the PoC verdict.
 - **The Gubernis sub-brand assets** (logo SVG variants, social-share images, business cards). Those don't yet exist; only the `§` wordmark and oxblood palette are defined. Add when needed.
-- **The Pragticality Ltd holding-company site** — that's [`pragticality-website`](https://github.com/smbriggs-alt/pragticality-website).
-- **The Gnomon product site** — that's [`gnomon-website`](https://github.com/smbriggs-alt/gnomon-website).
+- **The Pragticality Ltd holding-company site** — that's [`pragticality-website`](https://github.com/Pragticality-ltd/pragticality-website).
+- **The Gnomon product site** — that's [`gnomon-website`](https://github.com/Pragticality-ltd/gnomon-website).
 
 ## Conventions (inherited from sibling repos)
 
