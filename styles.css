@@ -822,6 +822,11 @@ a { color: var(--oxblood); text-decoration: none; }
   color: var(--oxblood);
   display: block;
   margin-bottom: 6px;
+  transition: color 0.15s ease;
+}
+.site-footer a:hover {
+  color: var(--oxblood-deep);
+  text-decoration: underline;
 }
 .footer-mark {
   font-family: 'Source Serif 4', serif;
