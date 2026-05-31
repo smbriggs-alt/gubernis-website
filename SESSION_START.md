@@ -30,6 +30,24 @@ its last pull. To avoid clobbering work done elsewhere:
      is only trustworthy if every session leaves it current, so append to the
      relevant section and never let it drift behind the code.
 
+## Recent changes
+
+- **2026-05-31** — Renamed the homepage `#this-week` section heading from
+  *"What changed this week"* to *"Areas of focus this period"* (commit
+  `2d8d070`). The weekly framing was an implicit cadence promise the
+  editorial refresh doesn't actually keep. The two CTAs that point at the
+  section now read *"See what we're configured to watch at this moment"*.
+  Docs (CLAUDE.md, this file, script docstring) updated in lockstep.
+  Anchor `id="this-week"` left as internal plumbing; `samples/` page kept
+  its weekly wording because those dispatches genuinely are weekly.
+- **2026-05-31** — Cards refreshed (commit `1913648`): HMRC-NEWS-6533
+  (UK commodity code dynamic-alignment with EU), OFAC-DELTA-2026-05-29
+  (standard SDN delta), EURLEX-32026R1144 (EU cultural-goods export
+  e-licences). All three ambiguity-flagged in the engine; picked for
+  jurisdiction balance (UK/US/EU) and topic spread (tariff /
+  sanctions / export control). Pulled from the live engine's last
+  14-day window via the picker script.
+
 ## ✅ Live — as of 2026-05-24
 
 **gubernis.com is live.** Engine running daily on Railway, marketing site
