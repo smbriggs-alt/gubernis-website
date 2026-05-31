@@ -84,7 +84,7 @@ search engines verified.
 
 **Follow-ups worth doing when you pick this up:**
 
-1. **Automate "What changed this week" cards (goal, not built).** Watch-counter
+1. **Automate "Areas of focus this period" cards (goal, not built).** Watch-counter
    numbers are already auto-patched at deploy from the live engine.
    Cards are not — they're still editorial via the interactive picker
    in `scripts/refresh_this_week_cards.py`. The goal is to **automate
@@ -212,7 +212,7 @@ Outstanding deploy-adjacent items:
 2. **Read `CLAUDE.md`** for the brand voice rules — what language is allowed, what's forbidden, what register to write in.
 3. **Open `index.html` in a browser** to see the current state. Three things to check first:
    - The Watch counter — is it showing reasonable numbers or are they obviously stale?
-   - The "What changed this week" cards — are the dates current?
+   - The "Areas of focus this period" cards — are the dates current?
    - The Ambiguity Watch section copy — does it still read as sharp, or has it drifted toward generic SaaS?
 4. **Check open decisions** at the bottom of `CLAUDE.md` — most are still unresolved as of the initial commit.
 
@@ -230,7 +230,7 @@ If the deployed numbers look wrong, debug the endpoint, not the HTML:
 curl -s https://pragticality-production.up.railway.app/gubernis/watch-counter | python3 -m json.tool
 ```
 
-### Refreshing the "What changed this week" cards
+### Refreshing the "Areas of focus this period" cards
 
 Currently manual / editorial. Use the picker:
 

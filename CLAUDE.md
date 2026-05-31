@@ -74,7 +74,7 @@ Single-page V1. All sections accessible via anchor links from the top nav.
 | (below hero) | The Watch — live ledger |
 | `#ambiguity-watch` | The Ambiguity Watch feature section (navy background) |
 | `#how-it-works` | What Gubernis does — intro with ontology callout |
-| `#this-week` | What changed this week — three cards |
+| `#this-week` | Areas of focus this period — three cards |
 | `#sources` | Sources covered — six-source proof bar |
 | `#pricing` | Four-tier pricing (Free / Starter / Pro-recommended / Enterprise) |
 | `#sign-up` | Final CTA — email capture for early-access list |

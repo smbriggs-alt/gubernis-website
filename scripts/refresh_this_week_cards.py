@@ -1,4 +1,4 @@
-"""Interactive refresh of the "What changed this week" cards in index.html.
+"""Interactive refresh of the "Areas of focus this period" cards in index.html.
 
 Fetches recent trade-relevant ingests from the Railway-hosted Gubernis
 engine, prints a numbered candidate list, lets you pick three, prompts
